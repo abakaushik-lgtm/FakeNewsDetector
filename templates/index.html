@@ -26,18 +26,21 @@
         <main>
             <div class="glass-panel input-section">
                 <textarea id="news-text" placeholder="Paste an article, claim, or social media post here to analyze..."></textarea>
-                <div class="controls">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="use-search" checked>
-                        <span class="slider"></span>
-                        <span class="label-text">Enable Live Web Fact-Checking</span>
-                    </label>
-                </div>
-                
-                <div class="api-key-container">
-                    <label for="api-key">Gemini API Key (Optional if set in environment):</label>
-                    <input type="password" id="api-key" placeholder="AIzaSy..." class="api-key-input">
-                </div>
+                <details class="advanced-settings">
+                    <summary>Advanced Settings</summary>
+                    <div class="advanced-content">
+                        <label class="toggle-container">
+                            <input type="checkbox" id="use-search" checked>
+                            <span class="slider"></span>
+                            <span class="label-text">Enable Live Web Fact-Checking</span>
+                        </label>
+                        
+                        <div class="api-key-container">
+                            <label for="api-key">Gemini API Key (Optional override):</label>
+                            <input type="password" id="api-key" placeholder="AIzaSy..." class="api-key-input">
+                        </div>
+                    </div>
+                </details>
 
                 <button id="analyze-btn" class="glow-on-hover">Analyze Content</button>
             </div>
