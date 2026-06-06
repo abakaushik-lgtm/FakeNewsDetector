@@ -86,7 +86,8 @@ def api_analyze():
                 "classification": "Error Parsing Output",
                 "credibility_score": 0,
                 "risk_indicators": ["Output was not valid JSON", f"Raw Output from AI: {result_str}"],
-                "fact_check_findings": []
+                "fact_check_findings": [],
+                "source_verification": []
             }
         return jsonify(result_dict)
     except Exception as e:

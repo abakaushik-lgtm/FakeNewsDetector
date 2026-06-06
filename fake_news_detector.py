@@ -32,6 +32,12 @@ Output Format:
       "claim": "Specific claim made in text",
       "status": "Supported / Unverified / Refuted"
     }
+  ],
+  "source_verification": [
+    {
+      "source": "Name of source (e.g. Reuters, WHO, or unknown blog)",
+      "status": "Verified / Unverified / Highly Suspicious"
+    }
   ]
 }"""
 
