@@ -85,6 +85,9 @@ def api_analyze():
             result_dict = {
                 "classification": "Error Parsing Output",
                 "credibility_score": 0,
+                "sentiment": "N/A",
+                "bias": "N/A",
+                "xai_explanation": "The AI model encountered an error or its output was blocked by safety filters.",
                 "risk_indicators": ["Output was not valid JSON", f"Raw Output from AI: {result_str}"],
                 "fact_check_findings": [],
                 "source_verification": []

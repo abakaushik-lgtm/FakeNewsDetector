@@ -24,6 +24,9 @@ Output Format:
 {
   "classification": "...",
   "credibility_score": 0,
+  "sentiment": "Emotional tone (e.g., Fear-mongering, Joy, Neutral)",
+  "bias": "Detected political or commercial bias",
+  "xai_explanation": "A 1-2 sentence explanation of exactly WHY the AI made this prediction",
   "risk_indicators": [
     "List of risk factors..."
   ],
