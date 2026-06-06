@@ -10,6 +10,7 @@ This project includes advanced data science capabilities:
 - **Source Credibility Scoring**: Estimates source credibility (0-100).
 - **Explainable AI (XAI)**: Provides a structural breakdown (lexical, factual, logical) detailing the reasoning behind the classification.
 - **Real-Time Fact-Checking**: Automatically searches the web for recent context to verify the claims using DuckDuckGo.
+- **Premium Web Interface**: A stunning, modern web application built with Flask and Glassmorphism design.
 
 ## Setup
 
@@ -23,24 +24,29 @@ This project includes advanced data science capabilities:
    - On Windows (PowerShell): `$env:GEMINI_API_KEY="your_api_key"`
    - On Linux/Mac: `export GEMINI_API_KEY="your_api_key"`
 
-## Usage
+## Usage (Web Application)
 
-You can pass the text directly via the command line:
+To run the web interface locally, execute:
+
+```bash
+python app.py
+```
+
+Then, open your web browser and navigate to the localhost URL:
+**http://127.0.0.1:5000**
+
+You can paste your news text directly into the web UI, and toggle the Live Web Fact-Checking feature.
+
+## Usage (Command Line)
+
+You can still use the script via the command line:
 
 ```bash
 python fake_news_detector.py --text "Your sensational news claim here"
 ```
 
-Or you can read from a text file:
+Or disable live web search from the CLI:
 
 ```bash
-python fake_news_detector.py --file article.txt
-```
-
-### Disabling Web Search
-
-By default, the script will extract a query from your text and search DuckDuckGo to fact-check the claim. If you want to disable this feature and rely only on the LLM's internal knowledge, use the `--no-search` flag:
-
-```bash
-python fake_news_detector.py --text "Your news claim" --no-search
+python fake_news_detector.py --text "Your claim" --no-search
 ```
