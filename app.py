@@ -23,12 +23,10 @@ def api_analyze():
         result_str = analyze_news(news_text, use_search=use_search)
         
         # Clean up markdown code blocks if the LLM outputted them
-        result_str = result_str.strip()
-        if result_str.startswith('```json'):
-            result_str = result_str[7:]
-        if result_str.endswith('```'):
-            result_str = result_str[:-3]
-        
+        match = re.search(r'\{.*\}', result_str, re.DOTALL)
+        if match:
+            result_str = match.group(0)
+            
         result_dict = json.loads(result_str.strip())
         return jsonify(result_dict)
     except Exception as e:

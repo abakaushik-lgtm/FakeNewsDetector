@@ -1,7 +1,8 @@
 import os
 import json
 import argparse
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 
 try:
     from duckduckgo_search import DDGS
@@ -9,10 +10,8 @@ try:
 except ImportError:
     HAS_DDGS = False
 
-# Configure the API key
+# Check for API key at the top
 api_key = os.environ.get("GEMINI_API_KEY")
-if api_key:
-    genai.configure(api_key=api_key)
 
 SYSTEM_PROMPT = """You are an advanced Fake News Detection AI. Your task is to analyze news articles, headlines, social media posts, or claims and determine their credibility.
 
@@ -57,18 +56,18 @@ Output Format:
   "verification_suggestions": []
 }"""
 
-def get_fact_check_context(news_text: str) -> str:
+def get_fact_check_context(news_text: str, client: genai.Client) -> str:
     if not HAS_DDGS:
         return "DuckDuckGo Search is not installed."
     
-    # Use a smaller prompt to extract a search query
     try:
-        model = genai.GenerativeModel(model_name="gemini-1.5-flash")
         query_prompt = f"Extract a concise search query (max 5 words) to fact-check the following claim or news:\n\n{news_text}\n\nSearch Query:"
-        query_response = model.generate_content(query_prompt)
+        query_response = client.models.generate_content(
+            model='gemini-1.5-flash',
+            contents=query_prompt,
+        )
         query = query_response.text.strip().replace('"', '').replace("'", "")
         
-        # Perform DuckDuckGo Search
         print(f"Fact-checking web query: '{query}'...")
         results = DDGS().text(query, max_results=3)
         
@@ -87,24 +86,29 @@ def analyze_news(news_text: str, use_search: bool = True) -> str:
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable is not set. Please set it to your Google Gemini API key.")
     
+    # Initialize the new SDK Client
+    client = genai.Client(api_key=api_key)
+
     # Fetch web context if enabled
     web_context = ""
     if use_search and HAS_DDGS:
-        web_context_text = get_fact_check_context(news_text)
+        web_context_text = get_fact_check_context(news_text, client)
         web_context = f"\n\n[Web Fact-Check Context]\n{web_context_text}"
         print("Web context gathered successfully.\n")
     elif use_search and not HAS_DDGS:
         print("Warning: duckduckgo-search not installed. Skipping web fact-checking.\n")
 
-    model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        system_instruction=SYSTEM_PROMPT,
-        generation_config={"response_mime_type": "application/json"}
-    )
-    
     prompt = f"Input:\n{news_text}{web_context}\n\nAnalyze the content and return the result in the specified format."
     
-    response = model.generate_content(prompt)
+    response = client.models.generate_content(
+        model='gemini-1.5-flash',
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=SYSTEM_PROMPT,
+            response_mime_type="application/json",
+        )
+    )
+    
     return response.text
 
 if __name__ == "__main__":
@@ -132,7 +136,6 @@ if __name__ == "__main__":
         
     try:
         result_json = analyze_news(news_text, use_search=not args.no_search)
-        # Parse and pretty print the JSON
         parsed_json = json.loads(result_json)
         print(json.dumps(parsed_json, indent=2))
     except Exception as e:
