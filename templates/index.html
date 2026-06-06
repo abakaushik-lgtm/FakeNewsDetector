@@ -26,21 +26,13 @@
         <main>
             <div class="glass-panel input-section">
                 <textarea id="news-text" placeholder="Paste an article, claim, or social media post here to analyze..."></textarea>
-                <details class="advanced-settings">
-                    <summary>Advanced Settings</summary>
-                    <div class="advanced-content">
-                        <label class="toggle-container">
-                            <input type="checkbox" id="use-search" checked>
-                            <span class="slider"></span>
-                            <span class="label-text">Enable Live Web Fact-Checking</span>
-                        </label>
-                        
-                        <div class="api-key-container">
-                            <label for="api-key">Gemini API Key (Optional override):</label>
-                            <input type="password" id="api-key" placeholder="AIzaSy..." class="api-key-input">
-                        </div>
-                    </div>
-                </details>
+                <div class="toggle-wrapper" style="margin-top: 15px; margin-bottom: 25px; text-align: left;">
+                    <label class="toggle-container">
+                        <input type="checkbox" id="use-search" checked>
+                        <span class="slider"></span>
+                        <span class="label-text">Enable Live Web Fact-Checking</span>
+                    </label>
+                </div>
 
                 <button id="analyze-btn" class="glow-on-hover">Analyze Content</button>
             </div>
@@ -124,7 +116,6 @@
         document.getElementById('analyze-btn').addEventListener('click', async () => {
             const text = document.getElementById('news-text').value;
             const useSearch = document.getElementById('use-search').checked;
-            const apiKey = document.getElementById('api-key').value;
 
             if (!text.trim()) {
                 showError('Please enter some text to analyze.');
@@ -140,7 +131,7 @@
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, use_search: useSearch, api_key: apiKey })
+                    body: JSON.stringify({ text, use_search: useSearch })
                 });
 
                 const data = await response.json();
