@@ -53,67 +53,21 @@
                 <p id="error-text"></p>
             </div>
 
-            <div id="results" class="hidden glass-panel result-section">
-                <div class="score-header">
-                    <div class="main-classification">
-                        <h2>Classification</h2>
-                        <h3 id="res-classification">Likely Fake</h3>
-                    </div>
-                    <div class="confidence-circle">
-                        <div class="progress-ring">
-                            <span id="res-confidence">87%</span>
-                        </div>
-                        <p>Confidence</p>
-                    </div>
+            <div id="results" class="hidden glass-panel result-section" style="text-align: left; line-height: 1.6;">
+                <h3 style="margin-top: 0;">Analysis Results</h3>
+                <div class="analysis-card" style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #fff;">📊 Credibility Score: <span id="res-score"></span></h4>
+                    <h4 style="margin: 0; color: #fff;">🟢 Classification: <span id="res-class"></span></h4>
                 </div>
 
-                <div class="advanced-metrics">
-                    <div class="metric-card">
-                        <h4>Sentiment</h4>
-                        <p id="res-sentiment">Fear-mongering</p>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Bias</h4>
-                        <p id="res-bias">Political</p>
-                    </div>
-                    <div class="metric-card">
-                        <h4>Credibility</h4>
-                        <p id="res-credibility">Low</p>
-                    </div>
+                <div class="analysis-card" style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #ffd600;">⚠️ Risk Indicators</h4>
+                    <ul id="res-risks" style="margin: 0; padding-left: 20px;"></ul>
                 </div>
 
-                <div class="details-section">
-                    <h3>Explainable AI Breakdown</h3>
-                    <div class="xai-grid">
-                        <div class="xai-box">
-                            <h5>Lexical Analysis</h5>
-                            <p id="xai-lexical">-</p>
-                        </div>
-                        <div class="xai-box">
-                            <h5>Factual Consistency</h5>
-                            <p id="xai-factual">-</p>
-                        </div>
-                        <div class="xai-box">
-                            <h5>Logical Flow</h5>
-                            <p id="xai-logical">-</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="lists-section">
-                    <div class="list-container">
-                        <h3>Key Indicators</h3>
-                        <ul id="res-indicators"></ul>
-                    </div>
-                    <div class="list-container">
-                        <h3>Fact-Checking Suggestions</h3>
-                        <ul id="res-suggestions"></ul>
-                    </div>
-                </div>
-                
-                <div class="reasoning-section">
-                    <h3>Overall Reasoning</h3>
-                    <p id="res-reasoning"></p>
+                <div class="analysis-card" style="margin-bottom: 0; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    <h4 style="margin: 0 0 10px 0; color: #4facfe;">🔍 Fact-Check Findings</h4>
+                    <ul id="res-claims" style="margin: 0; padding-left: 20px;"></ul>
                 </div>
             </div>
         </main>
@@ -170,46 +124,42 @@
         }
 
         function populateResults(data) {
-            document.getElementById('res-classification').innerText = data.classification || 'Unknown';
-            document.getElementById('res-confidence').innerText = (data.confidence_score || 0) + '%';
+            document.getElementById('res-score').innerText = (data.credibility_score || 0) + '%';
+            document.getElementById('res-class').innerText = data.classification || 'Unknown';
             
-            document.getElementById('res-sentiment').innerText = data.sentiment || 'N/A';
-            document.getElementById('res-bias').innerText = data.bias || 'N/A';
-            document.getElementById('res-credibility').innerText = (data.source_credibility_score || 0) + '/100';
-
-            if (data.xai_explanation) {
-                document.getElementById('xai-lexical').innerText = data.xai_explanation.lexical_analysis || '-';
-                document.getElementById('xai-factual').innerText = data.xai_explanation.factual_consistency || '-';
-                document.getElementById('xai-logical').innerText = data.xai_explanation.logical_flow || '-';
+            // Set circle color based on classification text
+            const cls = data.classification ? data.classification.toLowerCase() : "";
+            const classElem = document.getElementById('res-class');
+            if (cls.includes('fake') || cls.includes('suspicious')) {
+                classElem.style.color = '#ff4b4b'; // Red
+            } else if (cls.includes('real')) {
+                classElem.style.color = '#00e676'; // Green
+            } else {
+                classElem.style.color = '#ffd600'; // Yellow
             }
 
-            const indicators = document.getElementById('res-indicators');
-            indicators.innerHTML = '';
-            (data.key_indicators || []).forEach(item => {
+            const risks = document.getElementById('res-risks');
+            risks.innerHTML = '';
+            (data.risk_indicators || []).forEach(item => {
                 const li = document.createElement('li');
                 li.innerText = item;
-                indicators.appendChild(li);
+                li.style.color = '#ddd';
+                risks.appendChild(li);
             });
+            if (!data.risk_indicators || data.risk_indicators.length === 0) {
+                risks.innerHTML = '<li style="color:#aaa;">None detected.</li>';
+            }
 
-            const suggestions = document.getElementById('res-suggestions');
-            suggestions.innerHTML = '';
-            (data.verification_suggestions || []).forEach(item => {
+            const claims = document.getElementById('res-claims');
+            claims.innerHTML = '';
+            (data.fact_check_findings || []).forEach(item => {
                 const li = document.createElement('li');
-                li.innerText = item;
-                suggestions.appendChild(li);
+                li.innerText = item.claim + ": " + item.status;
+                li.style.color = '#ddd';
+                claims.appendChild(li);
             });
-
-            document.getElementById('res-reasoning').innerText = data.reasoning || 'No reasoning provided.';
-            
-            // Set colors based on classification
-            const cls = data.classification ? data.classification.toLowerCase() : "";
-            const resH3 = document.getElementById('res-classification');
-            if (cls.includes('fake')) {
-                resH3.style.color = '#ff4b4b';
-            } else if (cls.includes('real')) {
-                resH3.style.color = '#00e676';
-            } else {
-                resH3.style.color = '#ffd600';
+            if (!data.fact_check_findings || data.fact_check_findings.length === 0) {
+                claims.innerHTML = '<li style="color:#aaa;">No specific claims found.</li>';
             }
         }
     </script>

@@ -14,45 +14,25 @@ except ImportError:
 
 SYSTEM_PROMPT = """You are an advanced Fake News Detection AI. Your task is to analyze news articles, headlines, social media posts, or claims and determine their credibility.
 
-Instructions:
-
-Read the provided news text carefully.
 Identify factual claims made in the content.
-Check for:
-- Sensational or emotionally charged language
-- Lack of credible sources
-- Logical inconsistencies
-- Clickbait headlines
-- Misleading statistics or data
-
-Additionally, perform the following advanced analyses:
-1. **Sentiment Analysis**: Analyze the emotional tone (e.g., Fear-mongering, Outrage, Neutral, Joy).
-2. **Bias Detection**: Classify any political, commercial, or ideological bias.
-3. **Source Credibility**: Estimate a source credibility score (0-100) based on the text's formatting, claims, and any mentioned sources.
-4. **Explainable AI (XAI)**: Provide a structured breakdown detailing your reasoning across different dimensions (lexical analysis, factual consistency, logical flow).
+Check for sensational language, lack of sources, and logical inconsistencies.
 
 Classify the news into one of the following categories:
 Real News, Likely Real, Suspicious, Likely Fake, Fake News
 
-Provide a confidence score (0-100%).
-Suggest trusted sources or fact-checking methods for verification.
-If the input includes [Web Fact-Check Context], use those search results to evaluate the factual consistency of the claims.
-
 Output Format:
 {
   "classification": "...",
-  "confidence_score": 0,
-  "sentiment": "...",
-  "bias": "...",
-  "source_credibility_score": 0,
-  "xai_explanation": {
-    "lexical_analysis": "...",
-    "factual_consistency": "...",
-    "logical_flow": "..."
-  },
-  "key_indicators": [],
-  "reasoning": "...",
-  "verification_suggestions": []
+  "credibility_score": 0,
+  "risk_indicators": [
+    "List of risk factors..."
+  ],
+  "fact_check_findings": [
+    {
+      "claim": "Specific claim made in text",
+      "status": "Supported / Unverified / Refuted"
+    }
+  ]
 }"""
 
 def get_fact_check_context(news_text: str, client: genai.Client) -> str:
