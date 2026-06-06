@@ -1,3 +1,6 @@
 google-genai
 duckduckgo-search
 flask
+requests
+beautifulsoup4
+PyPDF2

@@ -30,13 +30,33 @@
 
         <main>
             <div class="glass-panel input-section">
-                <textarea id="news-text" placeholder="Paste an article, claim, or social media post here to analyze..."></textarea>
                 
-                <div class="example-inputs">
-                    <span>Try:</span>
-                    <button class="example-btn">"Scientists discover cure for cancer..."</button>
-                    <button class="example-btn">"Government announces new tax policy..."</button>
-                    <button class="example-btn">"Celebrity endorses miracle weight loss pill..."</button>
+                <div class="input-tabs">
+                    <button class="tab-btn active" data-tab="tab-text">Paste Content</button>
+                    <button class="tab-btn" data-tab="tab-url">Analyze URL</button>
+                    <button class="tab-btn" data-tab="tab-file">Upload Article (.txt/.pdf)</button>
+                </div>
+
+                <div id="tab-text" class="tab-content active">
+                    <textarea id="news-text" placeholder="Paste an article, claim, or social media post here to analyze..."></textarea>
+                    
+                    <div class="example-inputs">
+                        <span>Try:</span>
+                        <button class="example-btn">"Scientists discover cure for cancer..."</button>
+                        <button class="example-btn">"Government announces new tax policy..."</button>
+                        <button class="example-btn">"Celebrity endorses miracle weight loss pill..."</button>
+                    </div>
+                </div>
+
+                <div id="tab-url" class="tab-content hidden">
+                    <input type="url" id="news-url" placeholder="https://example.com/news-article..." class="url-input">
+                </div>
+
+                <div id="tab-file" class="tab-content hidden">
+                    <div class="file-drop-zone">
+                        <input type="file" id="news-file" accept=".txt,.pdf">
+                        <p>Drag & drop a .txt or .pdf file here, or click to browse</p>
+                    </div>
                 </div>
                 <div class="toggle-wrapper" style="margin-top: 15px; margin-bottom: 25px; text-align: left;">
                     <label class="toggle-container">
@@ -86,6 +106,31 @@
     </div>
 
     <script>
+        // Tab switching logic
+        let currentMode = 'text';
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+                
+                // Add active to clicked
+                btn.classList.add('active');
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId).classList.remove('hidden');
+                
+                if (tabId === 'tab-text') currentMode = 'text';
+                if (tabId === 'tab-url') currentMode = 'url';
+                if (tabId === 'tab-file') currentMode = 'file';
+            });
+        });
+
+        // File name display
+        document.getElementById('news-file').addEventListener('change', (e) => {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'Drag & drop a .txt or .pdf file here, or click to browse';
+            e.target.nextElementSibling.innerText = fileName;
+        });
+
         document.querySelectorAll('.example-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 document.getElementById('news-text').value = btn.innerText.replace(/"/g, '');
@@ -93,12 +138,24 @@
         });
 
         document.getElementById('analyze-btn').addEventListener('click', async () => {
-            const text = document.getElementById('news-text').value;
             const useSearch = document.getElementById('use-search').checked;
+            
+            const formData = new FormData();
+            formData.append('use_search', useSearch);
+            formData.append('mode', currentMode);
 
-            if (!text.trim()) {
-                showError('Please enter some text to analyze.');
-                return;
+            if (currentMode === 'text') {
+                const text = document.getElementById('news-text').value;
+                if (!text.trim()) { showError('Please enter some text to analyze.'); return; }
+                formData.append('text', text);
+            } else if (currentMode === 'url') {
+                const url = document.getElementById('news-url').value;
+                if (!url.trim()) { showError('Please enter a URL to analyze.'); return; }
+                formData.append('url', url);
+            } else if (currentMode === 'file') {
+                const fileInput = document.getElementById('news-file');
+                if (!fileInput.files[0]) { showError('Please select a file to upload.'); return; }
+                formData.append('file', fileInput.files[0]);
             }
 
             // Hide results and error, show loading
@@ -109,8 +166,7 @@
             try {
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, use_search: useSearch })
+                    body: formData
                 });
 
                 const data = await response.json();
