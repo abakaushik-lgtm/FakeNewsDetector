@@ -32,8 +32,14 @@
                         <span class="slider"></span>
                         <span class="label-text">Enable Live Web Fact-Checking</span>
                     </label>
-                    <button id="analyze-btn" class="glow-on-hover">Analyze Content</button>
                 </div>
+                
+                <div class="api-key-container">
+                    <label for="api-key">Gemini API Key (Optional if set in environment):</label>
+                    <input type="password" id="api-key" placeholder="AIzaSy..." class="api-key-input">
+                </div>
+
+                <button id="analyze-btn" class="glow-on-hover">Analyze Content</button>
             </div>
 
             <div id="loading" class="hidden">
@@ -113,11 +119,12 @@
 
     <script>
         document.getElementById('analyze-btn').addEventListener('click', async () => {
-            const text = document.getElementById('news-text').value.trim();
+            const text = document.getElementById('news-text').value;
             const useSearch = document.getElementById('use-search').checked;
-            
-            if (!text) {
-                showError("Please enter some text to analyze.");
+            const apiKey = document.getElementById('api-key').value;
+
+            if (!text.trim()) {
+                showError('Please enter some text to analyze.');
                 return;
             }
 
@@ -130,7 +137,7 @@
                 const response = await fetch('/api/analyze', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, use_search: useSearch })
+                    body: JSON.stringify({ text, use_search: useSearch, api_key: apiKey })
                 });
 
                 const data = await response.json();

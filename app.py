@@ -17,10 +17,11 @@ def api_analyze():
     
     news_text = data['text']
     use_search = data.get('use_search', True)
+    api_key = data.get('api_key', None)
     
     try:
         # analyze_news returns a JSON string from Gemini
-        result_str = analyze_news(news_text, use_search=use_search)
+        result_str = analyze_news(news_text, use_search=use_search, provided_api_key=api_key)
         
         # Clean up markdown code blocks if the LLM outputted them
         match = re.search(r'\{.*\}', result_str, re.DOTALL)

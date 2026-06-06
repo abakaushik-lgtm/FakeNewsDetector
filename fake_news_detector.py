@@ -81,10 +81,10 @@ def get_fact_check_context(news_text: str, client: genai.Client) -> str:
     except Exception as e:
         return f"Error during web search: {e}"
 
-def analyze_news(news_text: str, use_search: bool = True) -> str:
-    api_key = os.environ.get("GEMINI_API_KEY")
+def analyze_news(news_text: str, use_search: bool = True, provided_api_key: str = None) -> str:
+    api_key = provided_api_key or os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        raise ValueError("GEMINI_API_KEY environment variable is not set. Please set it to your Google Gemini API key.")
+        raise ValueError("API Key is missing! Please provide your Google Gemini API key.")
     
     # Initialize the new SDK Client
     client = genai.Client(api_key=api_key)
