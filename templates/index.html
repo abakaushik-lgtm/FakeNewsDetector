@@ -55,9 +55,16 @@
 
             <div id="results" class="hidden glass-panel result-section" style="text-align: left; line-height: 1.6;">
                 <h3 style="margin-top: 0;">Analysis Results</h3>
-                <div class="analysis-card" style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <h4 style="margin: 0 0 10px 0; color: #fff;">📊 Credibility Score: <span id="res-score"></span></h4>
-                    <h4 style="margin: 0; color: #fff;">🟢 Classification: <span id="res-class"></span></h4>
+                <div class="analysis-card" style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; gap: 30px;">
+                    <div class="confidence-circle">
+                        <div class="progress-ring" id="score-ring">
+                            <span id="res-score"></span>
+                        </div>
+                        <p style="font-size: 0.9rem; color: #a0a0a0;">Credibility</p>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0; color: #fff; font-size: 1.5rem;" id="class-container">🟢 <span id="res-class"></span></h4>
+                    </div>
                 </div>
 
                 <div class="analysis-card" style="margin-bottom: 15px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px;">
@@ -124,19 +131,26 @@
         }
 
         function populateResults(data) {
-            document.getElementById('res-score').innerText = (data.credibility_score || 0) + '%';
+            const score = data.credibility_score || 0;
+            document.getElementById('res-score').innerText = score + '%';
             document.getElementById('res-class').innerText = data.classification || 'Unknown';
             
             // Set circle color based on classification text
             const cls = data.classification ? data.classification.toLowerCase() : "";
-            const classElem = document.getElementById('res-class');
+            const classContainer = document.getElementById('class-container');
+            let ringColor = '#ffd600';
+            let emoji = '🟡';
+            
             if (cls.includes('fake') || cls.includes('suspicious')) {
-                classElem.style.color = '#ff4b4b'; // Red
+                ringColor = '#ff4b4b'; // Red
+                emoji = '🔴';
             } else if (cls.includes('real')) {
-                classElem.style.color = '#00e676'; // Green
-            } else {
-                classElem.style.color = '#ffd600'; // Yellow
+                ringColor = '#00e676'; // Green
+                emoji = '🟢';
             }
+            
+            classContainer.innerHTML = `${emoji} <span id="res-class" style="color: ${ringColor};">${data.classification || 'Unknown'}</span>`;
+            document.getElementById('score-ring').style.background = `conic-gradient(${ringColor} ${score}%, rgba(255,255,255,0.1) 0)`;
 
             const risks = document.getElementById('res-risks');
             risks.innerHTML = '';
