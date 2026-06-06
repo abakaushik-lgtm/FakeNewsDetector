@@ -27,7 +27,17 @@ def api_analyze():
         if match:
             result_str = match.group(0)
             
-        result_dict = json.loads(result_str.strip())
+        try:
+            result_dict = json.loads(result_str.strip())
+        except json.JSONDecodeError:
+            # Fallback if Gemini refused to output JSON (e.g., safety filters)
+            result_dict = {
+                "classification": "Error Parsing Output",
+                "confidence_score": 0,
+                "reasoning": f"Raw Output from AI: {result_str}",
+                "key_indicators": ["Output was not valid JSON"],
+                "verification_suggestions": ["Try again or check API keys/safety settings"]
+            }
         return jsonify(result_dict)
     except Exception as e:
         return jsonify({'error': str(e)}), 500

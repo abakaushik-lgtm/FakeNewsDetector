@@ -10,8 +10,7 @@ try:
 except ImportError:
     HAS_DDGS = False
 
-# Check for API key at the top
-api_key = os.environ.get("GEMINI_API_KEY")
+
 
 SYSTEM_PROMPT = """You are an advanced Fake News Detection AI. Your task is to analyze news articles, headlines, social media posts, or claims and determine their credibility.
 
@@ -83,6 +82,7 @@ def get_fact_check_context(news_text: str, client: genai.Client) -> str:
         return f"Error during web search: {e}"
 
 def analyze_news(news_text: str, use_search: bool = True) -> str:
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable is not set. Please set it to your Google Gemini API key.")
     
