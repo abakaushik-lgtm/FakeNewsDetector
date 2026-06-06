@@ -83,6 +83,7 @@ def api_analyze():
         except json.JSONDecodeError:
             # Fallback if Gemini refused to output JSON (e.g., safety filters)
             result_dict = {
+                "article_summary": "Summary could not be generated due to an error.",
                 "classification": "Error Parsing Output",
                 "credibility_score": 0,
                 "sentiment": "N/A",

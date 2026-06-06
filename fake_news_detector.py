@@ -22,6 +22,7 @@ Real News, Likely Real, Suspicious, Likely Fake, Fake News
 
 Output Format:
 {
+  "article_summary": "A concise 2-3 sentence summary of the article's main claims.",
   "classification": "...",
   "credibility_score": 0,
   "sentiment": "Emotional tone (e.g., Fear-mongering, Joy, Neutral)",
